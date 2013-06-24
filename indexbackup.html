@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<!--
+  Created using jsbin.com
+  Source can be edited via http://jsbin.com/ateho3/242/edit
+-->
+<head>
+<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="gif.js-master/dist/gif.js"></script>
+<script type="text/javascript" src="gif.js-master/dist/gif.worker.js" ></script>
+<meta charset=utf-8 />
+<title>Avinash</title>
+  
+<style>
+  body { background:#000; margin:0px; padding:0px; overflow:hidden; }
+</style>
+
+<style id="jsbin-css">
+
+</style>
+</head>
+<body>
+  <canvas id="canvas" height='400px'></canvas> 
+  
+  <form enctype="multipart/form-data" method="post" action="php/post.php" target="my_iframe">
+	  <input type="submit" name="Done" />
+  </form>
+  
+  <img id="result" >
+<script>
+
+var canvas = document.getElementById('canvas');
+var gifTitle;
+var img;
+// var shots  = [];
+var gif = new GIF({
+  workers: 2,
+  workerScript: 'gif.js-master/dist/gif.worker.js',
+  quality: 4
+});
+
+window.onload = function() {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var width  = window.innerWidth;
+    var height = window.innerHeight/2;
+    canvas.height = height;
+    canvas.width = width;
+    canvas.addEventListener('mousedown', function(e) {
+      this.down = true;  
+      this.X = e.pageX ;
+      this.Y = e.pageY ;
+      this.color = rgb();
+    }, 0);
+    canvas.addEventListener('mouseup', function() {
+      this.down = false;      
+    }, 0);
+    canvas.addEventListener('mousemove', function(e) {
+      this.style.cursor = 'pointer';
+      if(this.down) {
+         with(ctx) {
+          beginPath();
+          moveTo(this.X, this.Y);
+          lineTo(e.pageX , e.pageY );
+          strokeStyle = this.color;
+          stroke();
+         }
+         this.X = e.pageX ;
+         this.Y = e.pageY ;
+      }
+    }, 0);
+    
+    function rgb() {
+      color = 'rgb(';
+      for(var i = 0; i< 3; i++) {
+        color += Math.floor(Math.random() * 255)+',';
+      }
+      return color.replace(/\,$/,')')
+    }
+  };
+
+  canvas.onmouseup = function(){
+  	// img = canvas.toDataURL("image/png");
+  	// shots.push(img);
+  
+  	gif.addFrame(canvas, {delay: 200, copy: true});
+    // if (gif.frames = 3) {
+    //   gif.render();
+    // };
+    if(gif.frames.length > 4){
+        console.log("frames exceded");
+        gif.render();
+        // var endSrcTest = gif.toDataURL("image/gif");
+        // window.open(URL.createObjectURL(end));
+        // document.write('<img src="'+gif+'"/>');
+        // var objectURL = window.URL.createObjectURL(fileObj);
+    }
+  }
+
+	gif.on('finished', function(blob) {
+	    console.log("awesome");
+	    img = document.getElementById('result');
+	    img.src = URL.createObjectURL(blob);
+	    gifTitle = blob;
+	    console.log(img);
+	});
+
+</script>
+
+
+<script language="JavaScript">
+	function autoResize(id){
+	    var newheight;
+	    var newwidth;
+	
+	    if(document.getElementById){
+	        newheight=document.getElementById(id).contentWindow.document .body.scrollHeight;
+	        newwidth=document.getElementById(id).contentWindow.document .body.scrollWidth;
+	    }
+	
+	    document.getElementById(id).height= (newheight) + "px";
+	    document.getElementById(id).width= (newwidth) + "px";
+	}
+</script>
+
+<iframe  name="my_iframe" SRC="php/post.php" width="100%" height="200px" id="iframe1" marginheight="0" frameborder="0" onLoad="autoResize('iframe1');"></iframe>
+
+</body>
+</html>
